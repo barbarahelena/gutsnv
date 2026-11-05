@@ -1,0 +1,5 @@
+sample,fastq_1,fastq_2,cohort,subject,timepoint
+SAMPLE_A,/path/to/reads/SAMPLE_A_L001_R1.fastq.gz,/path/to/reads/SAMPLE_A_L001_R2.fastq.gz,cohort1,subject1,t1
+SAMPLE_A,/path/to/reads/SAMPLE_A_L002_R1.fastq.gz,/path/to/reads/SAMPLE_A_L002_R2.fastq.gz,cohort1,subject1,t1
+SAMPLE_B,/path/to/reads/SAMPLE_B_R1.fastq.gz,/path/to/reads/SAMPLE_B_R2.fastq.gz,cohort1,subject2,t1
+SAMPLE_C,/path/to/reads/SAMPLE_C.fastq.gz,,cohort2,subject3,

@@ -1,0 +1,68 @@
+nextflow_pipeline {
+
+    name "Test pipeline (stub)"
+    script "../main.nf"
+    tag "pipeline"
+    options "-stub"
+
+    test("-profile test -stub") {
+
+        when {
+            // The test samplesheet uses paths relative to the repository root; nf-test runs
+            // the pipeline from its own directory, so write a copy with absolute paths.
+            def data = new File("${baseDir}/tests/data").getCanonicalPath()
+            def samplesheet = new File("${outputDir}/samplesheet.csv")
+            samplesheet.getParentFile().mkdirs()
+            samplesheet.text = new File("${data}/samplesheet.csv").text.replace('tests/data/', "${data}/")
+
+            params {
+                outdir            = "$outputDir"
+                input             = samplesheet.getPath()
+            }
+        }
+
+        then {
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'samplesheet.csv'])
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(
+                    workflow.trace.succeeded().size(),
+                    stable_name
+                ).match() }
+            )
+        }
+    }
+
+    test("-profile test -stub, all optional steps skipped") {
+
+        when {
+            def data = new File("${baseDir}/tests/data").getCanonicalPath()
+            def samplesheet = new File("${outputDir}/samplesheet.csv")
+            samplesheet.getParentFile().mkdirs()
+            samplesheet.text = new File("${data}/samplesheet.csv").text.replace('tests/data/', "${data}/")
+
+            params {
+                outdir            = "$outputDir"
+                input             = samplesheet.getPath()
+                skip_fastqc       = true
+                skip_qc           = true
+                skip_host_removal = true
+                run_coverm        = false
+                skip_kinship      = true
+            }
+        }
+
+        then {
+            def stable_name = getAllFilesFromDir(params.outdir, relative: true, includeDir: true, ignore: ['pipeline_info/*.{html,json,txt}', 'samplesheet.csv'])
+            assertAll(
+                { assert workflow.success },
+                { assert !new File("${params.outdir}/qc/fastp").exists() },
+                { assert !new File("${params.outdir}/kinship/100003").exists() },
+                { assert snapshot(
+                    workflow.trace.succeeded().size(),
+                    stable_name
+                ).match() }
+            )
+        }
+    }
+}

@@ -1,0 +1,61 @@
+name: Run tests
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+# Cancel if a newer run is started
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NXF_VER: "26.10.5"
+  NFT_VER: "0.9.2"
+  NXF_ANSI_LOG: false
+  NXF_SINGULARITY_CACHEDIR: ${{ github.workspace }}/.singularity
+
+jobs:
+  test:
+    name: "${{ matrix.profile }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [docker, singularity]
+        isMain:
+          - ${{ github.base_ref == 'main' || github.ref == 'refs/heads/main' }}
+        # Singularity only for pull requests to and pushes on main
+        exclude:
+          - isMain: false
+            profile: singularity
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Nextflow and nf-test
+        run: |
+          curl -fsSL https://get.nextflow.io | bash
+          curl -fsSL https://get.nf-test.com | bash -s $NFT_VER
+          sudo mv nextflow nf-test /usr/local/bin/
+
+      - name: Set up Apptainer
+        if: matrix.profile == 'singularity'
+        uses: eWaterCycle/setup-apptainer@main
+
+      - name: Lint (strict syntax and type checking)
+        run: nextflow lint .
+
+      - name: Run nf-test (stub)
+        run: nf-test test tests/default.nf.test --profile +${{ matrix.profile }} --verbose

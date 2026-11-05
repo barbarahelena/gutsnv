@@ -1,0 +1,298 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/barbarahelena/gutsnv/main/nextflow_schema.json",
+    "title": "gutsnv pipeline parameters",
+    "description": "Generated from the typed params block in main.nf. Parameter validation is done by Nextflow itself; this schema is for documentation and launch forms.",
+    "type": "object",
+    "$defs": {
+        "input": {
+            "title": "Input",
+            "type": "object",
+            "description": "Input: samplesheet (CSV) with columns sample, fastq_1, fastq_2, cohort, subject, timepoint",
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "format": "file-path",
+                    "mimetype": "text/csv",
+                    "pattern": "^\\S+\\.csv$",
+                    "description": "input"
+                }
+            },
+            "required": [
+                "input"
+            ]
+        },
+        "read_preprocessing": {
+            "title": "Read preprocessing",
+            "type": "object",
+            "description": "Read preprocessing",
+            "properties": {
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "skip fastqc"
+                },
+                "skip_qc": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "skip adapter/quality trimming with fastp"
+                },
+                "skip_host_removal": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "skip host-read removal with Bowtie2"
+                },
+                "host_fasta": {
+                    "type": "string",
+                    "format": "path",
+                    "description": "host genome FASTA (an index is built)"
+                },
+                "host_index": {
+                    "type": "string",
+                    "format": "path",
+                    "description": "or: directory with a pre-built Bowtie2 index"
+                },
+                "save_clean_reads": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "save clean reads"
+                }
+            }
+        },
+        "species_abundance": {
+            "title": "Species abundance",
+            "type": "object",
+            "description": "Species abundance",
+            "properties": {
+                "run_coverm": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "also estimate abundance with CoverM (a GT-Pro-based estimate is always computed)"
+                },
+                "abundance_genomes": {
+                    "type": "string",
+                    "format": "path",
+                    "description": "directory with one reference genome FASTA per species (for CoverM)"
+                },
+                "abundance_genome_extension": {
+                    "type": "string",
+                    "default": "fna",
+                    "description": "abundance genome extension"
+                },
+                "genome2species": {
+                    "type": "string",
+                    "format": "path",
+                    "description": "optional TSV without header: genome<TAB>species_id"
+                }
+            }
+        },
+        "gt_pro_metagenotyping": {
+            "title": "GT-Pro metagenotyping",
+            "type": "object",
+            "description": "GT-Pro metagenotyping",
+            "properties": {
+                "gtpro_db": {
+                    "type": "string",
+                    "format": "path",
+                    "description": "directory with the GT-Pro database files"
+                },
+                "gtpro_db_name": {
+                    "type": "string",
+                    "default": "20190723_881species",
+                    "description": "gtpro db name"
+                },
+                "gtpro_snp_dict": {
+                    "type": "string",
+                    "format": "path",
+                    "description": "GT-Pro SNP dictionary (variants_main.covered.hq.snp_dict.tsv)"
+                },
+                "save_gtpro_raw": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "save gtpro raw"
+                },
+                "species_bins": {
+                    "type": "integer",
+                    "default": 64,
+                    "description": "number of parallel species bins"
+                },
+                "pos_offset": {
+                    "type": "integer",
+                    "default": 1,
+                    "description": "added to GT-Pro global positions in SNV IDs"
+                }
+            },
+            "required": [
+                "gtpro_db",
+                "gtpro_snp_dict"
+            ]
+        },
+        "allele_frequencies_and_strain_quasi_phaseability": {
+            "title": "Allele frequencies and strain quasi-phaseability",
+            "type": "object",
+            "description": "Allele frequencies and strain quasi-phaseability",
+            "properties": {
+                "min_depth": {
+                    "type": "integer",
+                    "default": 1,
+                    "description": "minimum reads at a site for an allele frequency"
+                },
+                "qp_min_depth": {
+                    "type": "integer",
+                    "default": 2,
+                    "description": "minimum reads at a site for quasi-phaseability"
+                },
+                "qp_site_major_freq": {
+                    "type": "number",
+                    "default": 0.9,
+                    "description": "a site is 'pure' if the major allele has > this fraction of reads"
+                },
+                "qp_min_frac": {
+                    "type": "number",
+                    "default": 0.8,
+                    "description": "a sample is quasi-phaseable if > this fraction of sites are pure"
+                },
+                "qp_min_sites": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "minimum sites to assess quasi-phaseability"
+                }
+            }
+        },
+        "per_cohort_snv_and_species_qc": {
+            "title": "Per-cohort SNV and species QC",
+            "type": "object",
+            "description": "Per-cohort SNV and species QC",
+            "properties": {
+                "snv_max_missing": {
+                    "type": "number",
+                    "default": 0.9,
+                    "description": "maximum fraction of cohort samples without data"
+                },
+                "snv_min_maf": {
+                    "type": "number",
+                    "default": 0.05,
+                    "description": "snv min maf"
+                },
+                "species_min_snvs": {
+                    "type": "integer",
+                    "default": 1000,
+                    "description": "species min snvs"
+                },
+                "min_species_samples": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "min species samples"
+                }
+            }
+        },
+        "strain_kinship": {
+            "title": "Strain kinship",
+            "type": "object",
+            "description": "Strain kinship",
+            "properties": {
+                "skip_kinship": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "skip kinship"
+                },
+                "kinship_qp_only": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "compute kinship on quasi-phaseable samples only"
+                },
+                "kinship_min_shared": {
+                    "type": "integer",
+                    "default": 1000,
+                    "description": "minimum shared SNVs per sample pair"
+                },
+                "kinship_max_snvs": {
+                    "type": "integer",
+                    "default": 0,
+                    "description": "subsample SNVs for the distance (0 = use all)"
+                },
+                "kinship_n_pcs": {
+                    "type": "integer",
+                    "default": 10,
+                    "description": "kinship n pcs"
+                }
+            }
+        },
+        "multiqc": {
+            "title": "MultiQC",
+            "type": "object",
+            "description": "MultiQC",
+            "properties": {
+                "multiqc_config": {
+                    "type": "string",
+                    "format": "path",
+                    "description": "multiqc config"
+                },
+                "multiqc_logo": {
+                    "type": "string",
+                    "format": "path",
+                    "description": "multiqc logo"
+                },
+                "multiqc_title": {
+                    "type": "string",
+                    "description": "multiqc title"
+                }
+            }
+        },
+        "output_options": {
+            "title": "Output options",
+            "type": "object",
+            "description": "Configuration-level options (nextflow.config)",
+            "properties": {
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "default": "results",
+                    "description": "Output directory"
+                },
+                "publish_dir_mode": {
+                    "type": "string",
+                    "default": "copy",
+                    "description": "How outputs are published",
+                    "enum": [
+                        "symlink",
+                        "rellink",
+                        "link",
+                        "copy",
+                        "copyNoFollow",
+                        "move"
+                    ]
+                }
+            }
+        }
+    },
+    "allOf": [
+        {
+            "$ref": "#/$defs/input"
+        },
+        {
+            "$ref": "#/$defs/read_preprocessing"
+        },
+        {
+            "$ref": "#/$defs/species_abundance"
+        },
+        {
+            "$ref": "#/$defs/gt_pro_metagenotyping"
+        },
+        {
+            "$ref": "#/$defs/allele_frequencies_and_strain_quasi_phaseability"
+        },
+        {
+            "$ref": "#/$defs/per_cohort_snv_and_species_qc"
+        },
+        {
+            "$ref": "#/$defs/strain_kinship"
+        },
+        {
+            "$ref": "#/$defs/multiqc"
+        },
+        {
+            "$ref": "#/$defs/output_options"
+        }
+    ]
+}
