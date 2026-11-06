@@ -10,8 +10,8 @@ process KINSHIP {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine in ['singularity', 'apptainer'] && !task.ext.singularity_pull_docker_container
-        ? 'oras://community.wave.seqera.io/library/r-ape_r-base_r-data.table:73189a23d396ba7a'
-        : 'community.wave.seqera.io/library/r-ape_r-base_r-data.table:dc4136918d8aef77' }"
+        ? 'oras://community.wave.seqera.io/library/findutils_gzip_r-ape_r-base_r-data.table:2ecb840cdd227774'
+        : 'community.wave.seqera.io/library/findutils_gzip_r-ape_r-base_r-data.table:c788f6d95371f0cf' }"
 
     input:
     record(species: String, af: Path, samples: Path)
