@@ -1,0 +1,5 @@
+sample,fastq_1,fastq_2,cohort,subject,timepoint
+s1,tests/data/reads/s1_L1_R1.fastq.gz,tests/data/reads/s1_L1_R2.fastq.gz,setA,p1,t1
+s1,tests/data/reads/s1_L2_R1.fastq.gz,tests/data/reads/s1_L2_R2.fastq.gz,setA,p1,t1
+s2,tests/data/reads/s2_R1.fastq.gz,tests/data/reads/s2_R2.fastq.gz,setA,p2,t1
+s3,tests/data/reads/s3.fastq.gz,,setB,p3,
